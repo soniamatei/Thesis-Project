@@ -1,0 +1,8 @@
+opencv-python>=4.9.0.80
+torch>=2.2.1
+ipython>=8.22.2
+pillow>=10.2.0
+scikit-learn>=1.4.1.post1
+torchvision>=0.17.1
+isort>=5.13.2
+matplotlib>=3.8.3
