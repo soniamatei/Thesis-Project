@@ -1,16 +1,13 @@
 from pathlib import Path
 
-import config
 import cv2
 import torch
 from PIL import Image
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import KFold, train_test_split
 from torch.utils.data import Dataset
 
-from data_augmentation import VideoTransform
-
-# TODO: add required structure for dataset folder in readme
-# TODO: decide final size for images time height width
+import config
+from data_handling.data_augmentation import VideoTransform
 
 
 class VideoDataset(Dataset):
@@ -19,7 +16,7 @@ class VideoDataset(Dataset):
         dataset: str,
         transformations: VideoTransform = None,
         val: bool = False,
-    ) -> None:
+    ):
         """
         :param dataset: name of the folder containing the dataset of choice
         :param transformations: transformations you want to apply to the dataset
@@ -45,10 +42,13 @@ class VideoDataset(Dataset):
             or not self._non_fight_folder_path.exists()
         ):
             raise ValueError(
-                "Paths to the folders of the dataset not found. Please check the path or structure of the folder."
+                "Paths to the folders of the dataset not found at {}. Please check the path or structure of the folder.".format(
+                    base_folder / dataset
+                )
             )
 
         self._train, self._val = self._split_data(fetch=True)
+        self._all = self._train + self._val
 
     def __len__(self) -> int:
         """
@@ -60,7 +60,8 @@ class VideoDataset(Dataset):
         """
         Getter for an item in the dataset based on index.
         :param idx: index
-        :return: the sample and the corresponding label
+        :return: - the sample [frames, channels (rgb), height, width]
+                 - the corresponding label [label]
         """
         video_path, label, path = self._get_by_flag(idx)
         capture = cv2.VideoCapture(str(path / video_path))
@@ -145,3 +146,13 @@ class VideoDataset(Dataset):
             x, y, test_size=0.25, shuffle=True
         )
         return list(zip(x_train, y_train)), list(zip(x_val, y_val))
+
+    # TODO: erase split if it isnt needed anymore
+    def k_fold(self, n_folds: int):
+        k_fold_split = KFold(n_splits=n_folds, shuffle=True)
+
+        for train_instances, val_instances in k_fold_split.split(self._all):
+            self._train = [self._all[index] for index in train_instances]
+            self._val = [self._all[index] for index in val_instances]
+
+            yield self

@@ -1,13 +1,15 @@
 import json
-from typing import Any
 
-import config
 import PIL.Image
+import jsonschema
 import torch
 from torchvision.transforms import v2
 
+import config
+
+
 # TODO: see about temporal crop and frame sampling for adding augmentations in temporal space
-# TODO: maybe save data every run aside from wandb
+# TODO: when tuned, do get(.. []) from json dict
 
 
 class VideoTransform:
@@ -21,42 +23,29 @@ class VideoTransform:
         :param json_file: json file with settings for augmentations
         """
         self._aug_val = {}
+        self._json_schema = config.AUGMENTATION_VALUES_SCHEMA
 
-        base_folder = config.ROOT_DIR / "data_handling"
-        self._json_file = base_folder / json_file
-
-        # check if json path is correct
-        if not self._json_file.exists():
-            raise ValueError("Json not found. Please check and try again.")
+        self._json_path = config.ROOT_DIR / "data_handling" / json_file
+        if not self._json_path.exists():
+            raise ValueError("No json file found at {}".format(self._json_path))
 
         # check if dataset exists in json
-        with open(self._json_file, "r") as file:
+        with open(self._json_path, "r") as file:
             temporary_fetch = json.load(file)
 
             if dataset not in temporary_fetch.keys():
-                raise ValueError("Dataset not found in json.")
+                raise ValueError("Dataset {} not found in json.".format(dataset))
             del temporary_fetch
         self._dataset = dataset
 
         self._load_augmentation_values()
-
-        self._transforms = v2.Compose(
-            [
-                v2.Resize(size=self._aug_val["resize"]),
-                v2.RandomHorizontalFlip(p=self._aug_val["horizontal_flip"]),
-                v2.RandomVerticalFlip(p=self._aug_val["vertical_flip"]),
-                v2.RandomRotation(degrees=self._aug_val["rotation"]),
-                v2.ColorJitter(**self._aug_val["color_jitter_params"]),
-                v2.Compose([v2.ToImage(), v2.ToDtype(torch.float32, scale=True)]),
-                v2.Normalize(mean=self._aug_val["mean"], std=self._aug_val["std"]),
-            ]
-        )
+        self._set_transforms()
 
     def __call__(self, frames: list[PIL.Image]) -> torch.Tensor:
         """
-        Apply the augmentations with the same random torch seed for torch for all frames given.
+        Apply the augmentations with the same random torch seed for torch for all images given.
         :param frames: multiple frames representing a single video
-        :return: the transformed frames
+        :return: the transformed frames [no. PIL images, channels, height, width]
         """
         # save the current state of torch
         state = torch.get_rng_state()
@@ -70,47 +59,71 @@ class VideoTransform:
 
         return torch.stack(transformed_frames)
 
-    def json(self, load: bool = False) -> dict[Any, Any]:
+    def json(self, load: bool = False) -> dict[any, any]:
         """
         Return the 'augmentation values dict.' plus an additional option of loading the settings again
         from the json file.
-        :param load: flag for loading the settings again
+        :param load: flag for loading the settings from file
         :return: 'augmentation values dict.'
         """
         if not isinstance(load, bool):
             raise ValueError("Please give 'load' a boolean value.")
         if load:
             self._load_augmentation_values()
+            self._set_transforms()
         return self._aug_val
 
-    def save(self, aug_values: dict[Any, Any], dump: bool = False):
+    def save(self, aug_values: dict[any, any] = None, dump: bool = False):
         """
-        Save the 'augmentation values dict.' given as parameter in the object plus an additional option
-        of saving them in the json file. ValueError is raised if the dictionary doesn't respect the structure.
+        Save the 'augmentation values dict.' given as parameter in the object json file an additional option
+        of saving reloading the object. ValueError is raised if the dictionary doesn't respect the structure.
         :param aug_values: settings for the augmentations
-        :param dump: flag for saving the settings in json file
+        :param dump: flag for dumping the settings to json file
         """
-        if not self._check_structure(self._aug_val, aug_values):
-            raise ValueError("Dictionary doesn't match the required structure.")
+        self._aug_val = aug_values
+        self._set_transforms()
+
         if not isinstance(dump, bool):
             raise ValueError("Please give 'dump' a boolean value.")
 
-        self._aug_val = aug_values
         if dump:
-            self._dump_augmentation_values()
+            self._dump_augmentation_values(aug_values)
+
+    def _set_transforms(self):
+        """
+        Set the transforms according to the json file.
+        """
+        self._transforms = v2.Compose(
+            [
+                v2.Resize(size=self._aug_val["resize"]),
+                v2.RandomHorizontalFlip(p=self._aug_val["horizontal_flip"]),
+                v2.RandomVerticalFlip(p=self._aug_val["vertical_flip"]),
+                v2.RandomRotation(degrees=self._aug_val["rotation"]),
+                v2.ColorJitter(**self._aug_val["color_jitter_params"]),
+                v2.Compose([v2.ToImage(), v2.ToDtype(torch.float32, scale=True)]),
+                v2.Normalize(mean=self._aug_val["mean"], std=self._aug_val["std"]),
+            ]
+        )
 
     def _load_augmentation_values(self):
         """
         Load the augmentation for the dataset from the json file.
         """
-        with open(self._json_file, mode="r") as file:
-            self._aug_val = json.load(file)[self._dataset]
+        with open(self._json_path, mode="r") as file:
+            temporary_fetch = json.load(fp=file)[self._dataset]
 
-    def _dump_augmentation_values(self):
+            # no need for if, validate raises error
+            jsonschema.validate(temporary_fetch, schema=self._json_schema)
+            self._aug_val = temporary_fetch
+
+    def _dump_augmentation_values(self, aug_values: dict[any, any]):
         """
         Dump the augmentation values for the dataset to the json file.
+        :param aug_values: settings for the augmentations
         """
-        with open(self._json_file, mode="r+") as file:
+        jsonschema.validate(aug_values, schema=self._json_schema)
+
+        with open(self._json_path, mode="r+") as file:
             temporary_fetch = json.load(file)
             temporary_fetch[self._dataset] = self._aug_val
             # go to start
@@ -118,27 +131,3 @@ class VideoTransform:
             # truncate file
             file.truncate()
             json.dump(obj=temporary_fetch, fp=file, indent=4)
-
-    def _check_structure(
-        self, self_object: dict[Any, Any], object: dict[Any, Any]
-    ) -> bool:
-        """
-        Checks if the structure of 2 dictionaries are the same looking at keys only.
-        Nesting search for nested dicts.
-        :param self_object: dictionary object of the class
-        :param object: outside object
-        :return: True -> they match; False otherwise
-        """
-        if isinstance(object, dict) and isinstance(self_object, dict):
-            # check if both dictionaries have the same keys
-            if self_object.keys() != object.keys():
-                return False
-
-            # recursively check the structure of nested dictionaries
-            for key in object:
-                if not self._check_structure(self_object[key], object[key]):
-                    return False
-            return True
-
-        else:
-            return True
