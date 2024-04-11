@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 import cv2
 import torch
@@ -16,11 +17,13 @@ class VideoDataset(Dataset):
         dataset: str,
         transformations: VideoTransform = None,
         val: bool = False,
+            val_size: float = 0.25
     ):
         """
         :param dataset: name of the folder containing the dataset of choice
         :param transformations: transformations you want to apply to the dataset
-        :param val: flag for validation dataset
+        :param val: flag for validation dataset (if True then validation dataset will be used)
+        :param val_size: size of the validation set. defaults to 0.25
         """
         # get root project dir
         base_folder = config.ROOT_DIR / "datasets"
@@ -47,12 +50,12 @@ class VideoDataset(Dataset):
                 )
             )
 
-        self._train, self._val = self._split_data(fetch=True)
+        self._train, self._val = self._split_data(val_size=val_size, fetch=True)
         self._all = self._train + self._val
 
     def __len__(self) -> int:
         """
-        :return: Number of videos in the dataset
+        :return: number of videos in the dataset
         """
         return len(self._train if not self._flag else self._val)
 
@@ -100,14 +103,16 @@ class VideoDataset(Dataset):
         self._flag = val
 
     @property
-    def dataset(self):
+    def dataset(self) -> str:
+        """Name of the dataset."""
         return self._dataset
 
-    def shuffle(self):
+    def shuffle(self, val_size: float = 0.25):
         """
         Shuffle the dataset (to reuse it in training for example).
+        :param val_size: size of the validation set. defaults to 0.25
         """
-        self._train, self._val = self._split_data()
+        self._train, self._val = self._split_data(val_size=val_size)
 
     def _get_by_flag(self, idx: int) -> tuple[str, bool, Path]:
         """
@@ -123,11 +128,15 @@ class VideoDataset(Dataset):
 
         return video_name, label, path
 
-    def _split_data(self, fetch: bool = False):
+    def _split_data(self, val_size: float, fetch: bool = False, ) -> tuple[list[Any], list[Any]]:
         """
         Split the dataset into train and validation sets.
         :param fetch: if set, fetches the data from the local memory
+        :return: train and validation sets containing (video_name, label[0, 1])
         """
+        if not isinstance(val_size, float) or not 0. < val_size < 1.:
+            raise ValueError("Please provide an real value for 'val_size' between (0, 1).")
+
         if fetch:
             # get sample names and their label (corresp. to the folder location)
             x, y = [], []
@@ -139,16 +148,21 @@ class VideoDataset(Dataset):
                     x.append(item.parts[-1])
                     y.append(label)
         else:
-            x, y = zip(*(self._train + self._val))
+            x, y = zip(*self._all)
 
         # make a balanced split of the data
         x_train, x_val, y_train, y_val = train_test_split(
-            x, y, test_size=0.25, shuffle=True
+            x, y, test_size=val_size, shuffle=True
         )
         return list(zip(x_train, y_train)), list(zip(x_val, y_val))
 
-    # TODO: erase split if it isnt needed anymore
-    def k_fold(self, n_folds: int):
+    def k_fold(self, n_folds: int) -> Any:
+        """
+        Helper function for kfold validation specific for this VideoDataset class. Must shuffle the dataset to the
+        desired size after using the function, otherwise it remains like the last fold.
+        :param n_folds: number of folds in the dataset
+        :return: an instance of self with training and validation sets changed according to the kfold validation split
+        """
         k_fold_split = KFold(n_splits=n_folds, shuffle=True)
 
         for train_instances, val_instances in k_fold_split.split(self._all):

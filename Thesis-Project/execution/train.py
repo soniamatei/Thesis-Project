@@ -1,10 +1,10 @@
+import numpy as np
 import torch
-from torch.nn import BCELoss
 import wandb
 from sklearn.metrics import f1_score
+from torch.nn import BCELoss
 from torch.optim import Adam
 from torch.utils import data
-import numpy as np
 
 from data_handling.data_augmentation import VideoTransform
 from data_handling.video_dataset import VideoDataset
@@ -27,7 +27,7 @@ sweep_config = {
             'max': 1e-2
         },
         'batch_size': {
-            'values': [8, 12, 16]
+            'values': [8, 12]
         },
         'n_folds': {
             'values': [5, 7, 4, 10]
@@ -95,7 +95,9 @@ def train():
             for n, fold in enumerate(dataset.k_fold(n_folds=wandb.config.n_folds)):
                 print("fold {}".format(n))
                 print("training")
+                # make the weights changeable
                 vd_model.train()
+                # use training part of dataset
                 fold.flag = False
 
                 dataloader = data.DataLoader(fold, batch_size=wandb.config.batch_size, collate_fn=collate_fn_pad)
@@ -120,9 +122,10 @@ def train():
                 vd_model.eval()
                 fold.flag = True
 
-                # track loss and f1 for the entire val dataset
+                # lists for tracking loss and f1 for the entire val dataset
                 cumulating_loss = 0.0
-                cumulating_outputs_labels = []
+                cumulating_outputs = []
+                cumulating_labels = []
 
                 for batch in dataloader:
                     print("batch")
@@ -133,16 +136,16 @@ def train():
                     loss = criterion(outputs, labels)
 
                     cumulating_loss += loss.cpu().item()
-                    cumulating_outputs_labels.append((outputs.cpu().detach(), labels.cpu().detach()))
+                    cumulating_outputs.extend(outputs.cpu().tolist())
+                    cumulating_labels.extend(labels.cpu().tolist())
 
                     if device == "cuda":
                         del videos, labels
                         torch.cuda.empty_cache()
 
                 avg_loss = cumulating_loss / len(dataloader)
-                all_outputs, all_labels = zip(*cumulating_outputs_labels)
-                all_outputs, all_labels = (np.array(all_outputs) >= 0.5), np.array(all_labels)
-                f1_score_result = f1_score(all_labels, all_outputs, average="binary")
+                all_outputs, all_labels = (np.array(cumulating_outputs) >= 0.5), np.array(cumulating_labels)
+                f1_score_result = f1_score(y_true=all_labels, y_pred=all_outputs, average="binary")
 
                 wandb.log({dataset.dataset + "_loss": avg_loss, dataset.dataset + "_f1score": f1_score_result})
 

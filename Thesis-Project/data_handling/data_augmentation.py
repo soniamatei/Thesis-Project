@@ -62,7 +62,7 @@ class VideoTransform:
     def json(self, load: bool = False) -> dict[any, any]:
         """
         Return the 'augmentation values dict.' plus an additional option of loading the settings again
-        from the json file.
+        from the json file. ValueError is raised if the dictionary from json doesn't respect the structure.
         :param load: flag for loading the settings from file
         :return: 'augmentation values dict.'
         """
