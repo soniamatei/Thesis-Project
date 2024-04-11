@@ -1,0 +1,8 @@
+{
+    "resnet_lstm_features": 256,
+    "lstm_hidden_size": 256,
+    "lstm_num_layers": 1,
+    "fc1_features": 128,
+    "fc2_features": 64,
+    "final_output_features": 1
+}
