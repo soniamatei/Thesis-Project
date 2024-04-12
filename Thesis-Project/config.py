@@ -3,7 +3,8 @@ import pathlib
 import torch
 from torchvision.transforms import v2
 
-ROOT_DIR = pathlib.Path("/home/sonia/Documents/Licenta/Thesis-Project/Thesis-Project")
+# ROOT_DIR = pathlib.Path("/home/sonia/Documents/Licenta/Thesis-Project/Thesis-Project")
+ROOT_DIR = pathlib.Path("C:\\Users\\sonia\\Desktop\\Thesis-Project\\Thesis-Project")
 BASIC_TRANSFORMS = v2.Compose(
     [
         v2.Resize(size=(360, 360)),
