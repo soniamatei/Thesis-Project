@@ -1,5 +1,8 @@
-import torch
+import io
 
+import numpy as np
+import torch
+import matplotlib.pyplot as plt
 from data_handling.video_dataset import VideoDataset
 
 
@@ -63,3 +66,18 @@ def compute_mean_std(
     std = torch.sqrt(variance)
 
     return mean, std
+
+
+def plot_to_image_buff(x: np.array, label: str = "") -> io.BytesIO:
+    fig, ax = plt.subplots()
+    ax.plot(x, label=label)
+    ax.legend()
+    # create a buffer
+    img_buf = io.BytesIO()
+    # save the figure to the buffer
+    fig.savefig(img_buf, format='png')
+    # rewind the buffer to the beginning, so it can be read from
+    img_buf.seek(0)
+    plt.close(fig)
+
+    return img_buf

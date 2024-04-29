@@ -1,86 +1,86 @@
 {
-    "RWF-2000": {
-        "resize": [
-            224,
-            224
-        ],
-        "horizontal_flip": 0.5,
-        "vertical_flip": 0.5,
-        "rotation": [
-            0,
-            360
-        ],
-        "color_jitter_params": {
-            "brightness": 0.3922703492012967,
-            "contrast": 0.3959009193706804,
-            "saturation": 0.2406945343293924,
-            "hue": 0.055004273439839074
-        },
-        "mean": [
-            0.391,
-            0.384,
-            0.3789
-        ],
-        "std": [
-            0.2617,
-            0.2609,
-            0.2615
-        ]
+  "RWF-2000": {
+    "resize": [
+      224,
+      224
+    ],
+    "horizontal_flip": 0.5,
+    "vertical_flip": 0.5,
+    "rotation": [
+      0,
+      360
+    ],
+    "color_jitter_params": {
+      "brightness": 0.3922703492012967,
+      "contrast": 0.3959009193706804,
+      "saturation": 0.2406945343293924,
+      "hue": 0.055004273439839074
     },
-    "HockeyFights": {
-        "resize": [
-            224,
-            224
-        ],
-        "horizontal_flip": 0.5,
-        "vertical_flip": 0.5,
-        "rotation": [
-            0,
-            360
-        ],
-        "color_jitter_params": {
-            "brightness": 0.3922703492012967,
-            "contrast": 0.3959009193706804,
-            "saturation": 0.2406945343293924,
-            "hue": 0.055004273439839074
-        },
-        "mean": [
-            0.3688,
-            0.37,
-            0.3593
-        ],
-        "std": [
-            0.3657,
-            0.3694,
-            0.3645
-        ]
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ]
+  },
+  "HockeyFights": {
+    "resize": [
+      224,
+      224
+    ],
+    "horizontal_flip": 0.5,
+    "vertical_flip": 0.5,
+    "rotation": [
+      0,
+      360
+    ],
+    "color_jitter_params": {
+      "brightness": 0.3922703492012967,
+      "contrast": 0.3959009193706804,
+      "saturation": 0.2406945343293924,
+      "hue": 0.055004273439839074
     },
-    "Fight-Surveillance": {
-        "resize": [
-            224,
-            224
-        ],
-        "horizontal_flip": 0.5,
-        "vertical_flip": 0.5,
-        "rotation": [
-            0,
-            360
-        ],
-        "color_jitter_params": {
-            "brightness": 0.2,
-            "contrast": 0.2,
-            "saturation": 0.2,
-            "hue": 0.02
-        },
-        "mean": [
-            0.4278,
-            0.4154,
-            0.4131
-        ],
-        "std": [
-            0.2538,
-            0.2515,
-            0.2538
-        ]
-    }
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ]
+  },
+  "Fight-Surveillance": {
+    "resize": [
+      224,
+      224
+    ],
+    "horizontal_flip": 0.5,
+    "vertical_flip": 0.5,
+    "rotation": [
+      0,
+      360
+    ],
+    "color_jitter_params": {
+      "brightness": 0.2,
+      "contrast": 0.2,
+      "saturation": 0.2,
+      "hue": 0.02
+    },
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ]
+  }
 }

@@ -40,12 +40,6 @@ class ViolenceDetectionModel(nn.Module):
             batch_first=True,
         )
 
-        # TODO: test:
-        #     - dropout/batch norm
-        #     - reg layer before/after activations
-        #     - reg layer places
-        #     - gru/lstm
-        #     - unfreezing params
         self.fc = nn.Sequential(
             nn.Linear(
                 in_features=self._settings["lstm_hidden_size"],
