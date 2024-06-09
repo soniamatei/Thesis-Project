@@ -17,7 +17,7 @@ class VideoDataset(Dataset):
         dataset: str,
         transformations: VideoTransform = None,
         val: bool = False,
-            val_size: float = 0.25
+        val_size: float = 0.25
     ):
         """
         :param dataset: name of the folder containing the dataset of choice
@@ -128,7 +128,7 @@ class VideoDataset(Dataset):
 
         return video_name, label, path
 
-    def _split_data(self, val_size: float, fetch: bool = False, ) -> tuple[list[Any], list[Any]]:
+    def _split_data(self, val_size: float, fetch: bool = False) -> tuple[list[Any], list[Any]]:
         """
         Split the dataset into train and validation sets.
         :param fetch: if set, fetches the data from the local memory

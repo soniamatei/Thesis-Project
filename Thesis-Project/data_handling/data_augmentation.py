@@ -7,8 +7,6 @@ from torchvision.transforms import v2
 
 import config
 
-
-# TODO: see about temporal crop and frame sampling for adding augmentations in temporal space
 # TODO: when tuned, do get(.. []) from json dict
 
 
@@ -99,7 +97,6 @@ class VideoTransform:
                 v2.RandomHorizontalFlip(p=self._aug_val["horizontal_flip"]),
                 v2.RandomVerticalFlip(p=self._aug_val["vertical_flip"]),
                 v2.RandomRotation(degrees=self._aug_val["rotation"]),
-                # v2.ColorJitter(**self._aug_val["color_jitter_params"]),
                 v2.Compose([v2.ToImage(), v2.ToDtype(torch.float32, scale=True)]),
                 v2.Normalize(mean=self._aug_val["mean"], std=self._aug_val["std"]),
             ]

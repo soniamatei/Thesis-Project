@@ -33,10 +33,10 @@
       224
     ],
     "horizontal_flip": 0.5,
-    "vertical_flip": 0.5,
+    "vertical_flip": 0,
     "rotation": [
       0,
-      360
+      45
     ],
     "color_jitter_params": {
       "brightness": 0.3922703492012967,

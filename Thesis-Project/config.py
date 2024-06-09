@@ -4,7 +4,8 @@ import torch
 from torchvision.transforms import v2
 
 # ROOT_DIR = pathlib.Path("/home/sonia/Documents/Licenta/Thesis-Project/Thesis-Project")
-ROOT_DIR = pathlib.Path("C:\\Users\\sonia\\Desktop\\Thesis-Project\\Thesis-Project")
+# ROOT_DIR = pathlib.Path("C:\\Users\\sonia\\Desktop\\Thesis-Project\\Thesis-Project")
+ROOT_DIR = pathlib.Path("/home/sonia2oo2soia/projects/Thesis-Project/Thesis-Project")
 BASIC_TRANSFORMS = v2.Compose(
     [
         v2.Resize(size=(360, 360)),
@@ -15,13 +16,13 @@ BASIC_TRANSFORMS = v2.Compose(
 MODEL_SETTINGS_SCHEMA = {
     "type": "object",
     "properties": {
-        "resnet_lstm_features": {
+        "vit_hidden_size": {
             "type": "integer"
         },
-        "lstm_hidden_size": {
+        "nhead": {
             "type": "integer"
         },
-        "lstm_num_layers": {
+        "num_layers": {
             "type": "integer"
         },
         "fc1_features": {
@@ -35,9 +36,9 @@ MODEL_SETTINGS_SCHEMA = {
         }
     },
     "required": [
-        "resnet_lstm_features",
-        "lstm_hidden_size",
-        "lstm_num_layers",
+        "vit_hidden_size",
+        "nhead",
+        "num_layers",
         "fc1_features",
         "fc2_features",
         "final_output_features"
