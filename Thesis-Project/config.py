@@ -16,24 +16,12 @@ BASIC_TRANSFORMS = v2.Compose(
 MODEL_SETTINGS_SCHEMA = {
     "type": "object",
     "properties": {
-        "vit_hidden_size": {
-            "type": "integer"
-        },
-        "nhead": {
-            "type": "integer"
-        },
-        "num_layers": {
-            "type": "integer"
-        },
-        "fc1_features": {
-            "type": "integer"
-        },
-        "fc2_features": {
-            "type": "integer"
-        },
-        "final_output_features": {
-            "type": "integer"
-        }
+        "vit_hidden_size": {"type": "integer"},
+        "nhead": {"type": "integer"},
+        "num_layers": {"type": "integer"},
+        "fc1_features": {"type": "integer"},
+        "fc2_features": {"type": "integer"},
+        "final_output_features": {"type": "integer"},
     },
     "required": [
         "vit_hidden_size",
@@ -41,8 +29,8 @@ MODEL_SETTINGS_SCHEMA = {
         "num_layers",
         "fc1_features",
         "fc2_features",
-        "final_output_features"
-    ]
+        "final_output_features",
+    ],
 }
 
 AUGMENTATION_VALUES_SCHEMA = {
@@ -50,11 +38,9 @@ AUGMENTATION_VALUES_SCHEMA = {
     "properties": {
         "resize": {
             "type": "array",
-            "items": {
-                "type": "integer"
-            },
+            "items": {"type": "integer"},
             "minItems": 2,
-            "maxItems": 2
+            "maxItems": 2,
         },
         "horizontal_flip": {
             "type": "number",
@@ -64,11 +50,9 @@ AUGMENTATION_VALUES_SCHEMA = {
         },
         "rotation": {
             "type": "array",
-            "items": {
-                "type": "integer"
-            },
+            "items": {"type": "integer"},
             "minItems": 2,
-            "maxItems": 2
+            "maxItems": 2,
         },
         "color_jitter_params": {
             "type": "object",
@@ -84,26 +68,30 @@ AUGMENTATION_VALUES_SCHEMA = {
                 },
                 "hue": {
                     "type": "number",
-                }
+                },
             },
-            "required": ["brightness", "contrast", "saturation", "hue"]
+            "required": ["brightness", "contrast", "saturation", "hue"],
         },
         "mean": {
             "type": "array",
-            "items": {
-                "type": "number"
-            },
+            "items": {"type": "number"},
             "minItems": 3,
-            "maxItems": 3
+            "maxItems": 3,
         },
         "std": {
             "type": "array",
-            "items": {
-                "type": "number"
-            },
+            "items": {"type": "number"},
             "minItems": 3,
-            "maxItems": 3
-        }
+            "maxItems": 3,
+        },
     },
-    "required": ["resize", "horizontal_flip", "vertical_flip", "rotation", "color_jitter_params", "mean", "std"]
+    "required": [
+        "resize",
+        "horizontal_flip",
+        "vertical_flip",
+        "rotation",
+        "color_jitter_params",
+        "mean",
+        "std",
+    ],
 }

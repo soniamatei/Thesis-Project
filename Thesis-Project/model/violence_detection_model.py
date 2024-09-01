@@ -25,7 +25,9 @@ class ViolenceDetectionModel(nn.Module):
         self._load_model_settings()
 
         vit_config = ViTConfig(hidden_size=self._settings["vit_hidden_size"])
-        self.vit = ViTModel.from_pretrained("google/vit-base-patch16-224-in21k", config=vit_config)
+        self.vit = ViTModel.from_pretrained(
+            "google/vit-base-patch16-224-in21k", config=vit_config
+        )
         for param in self.vit.parameters():
             param.requires_grad = False
 
@@ -60,14 +62,16 @@ class ViolenceDetectionModel(nn.Module):
 
         # get features for each frame
         videos = videos.view(batch_size * frames, channels, height, width)
-        videos = self.vit(videos).last_hidden_state[:, 0, :]  # Use [CLS] token representation
+        videos = self.vit(videos).last_hidden_state[
+            :, 0, :
+        ]  # Use [CLS] token representation
         videos = videos.view(batch_size, frames, -1)
 
         videos = videos.permute(1, 0, 2)  # (frames, batch_size, feature_dim)
         # Transformer Encoder for temporal modeling
         videos = self.transformer_encoder(videos, lengths)
 
-        videos = videos.permute(1, 0, 2) # (batch_size, frames, feature_dim)
+        videos = videos.permute(1, 0, 2)  # (batch_size, frames, feature_dim)
 
         # take the mean output from the encoder
         videos = videos.mean(dim=1)
@@ -89,8 +93,7 @@ class ViolenceDetectionModel(nn.Module):
 
 
 class TransformerModel(nn.Module):
-    def __init__(self, d_model: int, nhead: int,
-                 nlayers: int, dropout: float = 0.5):
+    def __init__(self, d_model: int, nhead: int, nlayers: int, dropout: float = 0.5):
         super().__init__()
         self.pos_encoder = PositionalEncoding(d_model, dropout)
         encoder_layers = TransformerEncoderLayer(d_model, nhead)
@@ -115,7 +118,9 @@ class TransformerModel(nn.Module):
         output = self.transformer_encoder(src=src, src_key_padding_mask=mask)
         return output
 
-    def create_padding_mask(self, src: torch.Tensor, lengths: torch.Tensor) -> torch.Tensor:
+    def create_padding_mask(
+        self, src: torch.Tensor, lengths: torch.Tensor
+    ) -> torch.Tensor:
         """
         Creates a padding mask for the transformer encoder.
 
@@ -133,7 +138,7 @@ class TransformerModel(nn.Module):
             mask[i, length:] = True
 
         return mask
-    
+
 
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model: int, dropout: float = 0.1, max_len: int = 5000):
@@ -141,16 +146,18 @@ class PositionalEncoding(nn.Module):
         self.dropout = nn.Dropout(p=dropout)
 
         position = torch.arange(max_len).unsqueeze(1)
-        div_term = torch.exp(torch.arange(0, d_model, 2) * (-math.log(10000.0) / d_model))
+        div_term = torch.exp(
+            torch.arange(0, d_model, 2) * (-math.log(10000.0) / d_model)
+        )
         pe = torch.zeros(max_len, 1, d_model)
         pe[:, 0, 0::2] = torch.sin(position * div_term)
         pe[:, 0, 1::2] = torch.cos(position * div_term)
-        self.register_buffer('pe', pe)
+        self.register_buffer("pe", pe)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Arguments:
             x: Tensor, shape ``[seq_len, batch_size, embedding_dim]``
         """
-        x = x + self.pe[:x.size(0)]
+        x = x + self.pe[: x.size(0)]
         return self.dropout(x)
