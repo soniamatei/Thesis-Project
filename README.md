@@ -1,1 +1,4 @@
 # Thesis-Project
+
+
+This project features a violence detection model comprised of a [VIT](https://huggingface.co/docs/transformers/en/model_doc/vit) to extract spatial features and a transformer encoder for temporal analysis. It is trained on 1000 videos from hockey games that contain violent and non-violent interactions between the players ([Hockey Fights](https://www.kaggle.com/datasets/yassershrief/hockey-fight-vidoes/data)). F1 score and accuracy is used in order to evaluate the model as well as a GUI interface to interact with it. Also, the training and data analysis was done using Weights and Biases ([link to project](https://wandb.ai/soniamatei/vd_model_training/overview)).

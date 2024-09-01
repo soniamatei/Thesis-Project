@@ -1,0 +1,86 @@
+{
+    "RWF-2000": {
+        "resize": [
+            255,
+            255
+        ],
+        "horizontal_flip": 0.5,
+        "vertical_flip": 0.5,
+        "rotation": [
+            0,
+            360
+        ],
+        "color_jitter_params": {
+            "brightness": 0.2,
+            "contrast": 0.2,
+            "saturation": 0.2,
+            "hue": 0.02
+        },
+        "mean": [
+            0.391,
+            0.384,
+            0.3789
+        ],
+        "std": [
+            0.2617,
+            0.2609,
+            0.2615
+        ]
+    },
+    "HockeyFights": {
+        "resize": [
+            360,
+            360
+        ],
+        "horizontal_flip": 0.5,
+        "vertical_flip": 0.5,
+        "rotation": [
+            0,
+            360
+        ],
+        "color_jitter_params": {
+            "brightness": 0.2,
+            "contrast": 0.2,
+            "saturation": 0.2,
+            "hue": 0.02
+        },
+        "mean": [
+            0.3688,
+            0.37,
+            0.3593
+        ],
+        "std": [
+            0.3657,
+            0.3694,
+            0.3645
+        ]
+    },
+    "Fight-Surveillance": {
+        "resize": [
+            224,
+            224
+        ],
+        "horizontal_flip": 0.5,
+        "vertical_flip": 0.5,
+        "rotation": [
+            0,
+            360
+        ],
+        "color_jitter_params": {
+            "brightness": 0.2,
+            "contrast": 0.2,
+            "saturation": 0.2,
+            "hue": 0.02
+        },
+        "mean": [
+            0.4278,
+            0.4154,
+            0.4131
+        ],
+        "std": [
+            0.2538,
+            0.2515,
+            0.2538
+        ]
+    }
+}

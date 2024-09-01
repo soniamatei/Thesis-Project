@@ -1,0 +1,8 @@
+.idea
+__pycache__
+datasets
+wandb
+venv
+Thesis-Project/execution/artifacts
+Thesis-Project/execution/flagged
+Thesis-Project/execution/animation.gif

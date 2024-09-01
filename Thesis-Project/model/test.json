@@ -1,0 +1,8 @@
+{
+    "vit_hidden_size": 768,
+    "nhead": 8,
+    "num_layers": 6,
+    "fc1_features": 256,
+    "fc2_features": 128,
+    "final_output_features": 1
+}
