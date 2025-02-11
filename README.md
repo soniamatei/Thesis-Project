@@ -8,8 +8,6 @@ This project aims to detect violence within a video. It is structured into three
 
 Each component is implemented in `.py` files and tested within `.ipynb` notebooks to ensure correctness before training. The project follows PyTorch standards for implementation.  
 
----
-
 ## Dataset Handling  
 
 The dataset module is responsible for loading and preparing video data for training.  
@@ -23,8 +21,6 @@ The dataset module is responsible for loading and preparing video data for train
   - ensures transformations are applied to each video frame  
   - transformations can be: loaded from a JSON file (validated for correctness) and modified in the code and saved to a JSON file if desired
 
----
-
 ## Model Structure  
 
 The violence detection model is implemented using `torch.nn.Module` as a base class.  
@@ -32,8 +28,6 @@ The violence detection model is implemented using `torch.nn.Module` as a base cl
 - **Model Architecture**  
   - uses a **Vision Transformer (ViT)** for spatial feature extraction  [Hugging Face ViT Documentation](https://huggingface.co/docs/transformers/en/model_doc/vit)
   - a **Transformer Encoder** is applied for temporal analysis  (inspired by official PyTorch recommendations)
-
----
 
 ## Training & Execution  
 
